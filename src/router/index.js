@@ -31,6 +31,22 @@ const router = createRouter({
         name: 'EmployeeForm',
         component: () => import('@/views/EmployeeForm.vue')
       },
+      {
+        path: 'user-form',
+        name: 'UserForm',
+        component: () => import('@/views/UserForm.vue')
+      },
+
+      {
+        path: 'user',
+        name: 'user',
+        component: () => import('@/views/User.vue'),
+      },
+      {
+        path: 'admin',
+        name: 'admin',
+        component: () => import('@/views/Admin.vue'),
+      },
       ],
     },
     {
