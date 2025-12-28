@@ -98,13 +98,12 @@ onMounted(() => {
       <el-table :data="data.tableData" style="width: 100%; margin-bottom: 10px"
         @selection-change="handleSelectionChange" stripe>
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="username" label="管理员账号" />
         <el-table-column prop="email" label="邮箱" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.status === 1 ? 'success' : 'primary'">{{ scope.row.status === 1 ? '正常' : '禁用'
-              }}</el-tag>
+            }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" />

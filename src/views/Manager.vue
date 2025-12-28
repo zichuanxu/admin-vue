@@ -1,44 +1,55 @@
 <template>
-  <div>
-    <div style="
-        height: 60px;
-        background-color: #3573f3;
-        align-items: center;
-        display: flex;
-      ">
-      <div style="
-          width: 200px;
-          display: flex;
-          align-items: center;
-          margin-left: 20px;
-        ">
-        <img src="/admin-panel.png" style="width: 32px; height: 32px; margin-right: 10px" />
-        <span style="font-size: 25px; color: white">后台管理系统</span>
+  <div class="main-container">
+    <el-header class="main-header">
+      <div class="logo-box">
+        <img src="/admin-panel.png" class="logo-img" />
+        <span class="logo-text">后台管理系统</span>
       </div>
-      <div style="flex: 1"></div>
-      <div style="width: fit-content; display: flex; align-items: center">
-        <el-avatar src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif" />
-        <span style="color: white; margin-left: 8px; margin-right: 10px">管理员</span>
-      </div>
-    </div>
 
-    <!-- 下方主要内容 -->
-    <div style="display: flex">
-      <!-- 左侧菜单栏 START -->
-      <div style="
-          width: 200px;
-          border-right: 1px solid #ddd;
-          min-height: calc(100vh - 60px);
-        ">
-        <el-menu router :default-active="router.currentRoute.value.path" style="border: 0" :default-openeds="['1']">
-          <el-menu-item index="/manager/home"><el-icon>
+      <div class="header-right">
+        <el-dropdown trigger="click">
+          <div class="user-info">
+            <el-avatar :size="35" src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif" />
+            <span class="username">管理员</span>
+            <el-icon>
+              <ArrowDown />
+            </el-icon>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="router.push('/manager/info')">个人信息</el-dropdown-item>
+              <el-dropdown-item divided @click="router.push('/manager/exit')">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </el-header>
+
+    <div class="content-wrapper">
+      <aside class="main-sidebar">
+        <el-menu router :default-active="router.currentRoute.value.path" class="el-menu-vertical"
+          :default-openeds="['1']">
+          <el-menu-item index="/manager/home">
+            <el-icon>
               <House />
             </el-icon>
-            <span>系统首页</span></el-menu-item>
-          <el-menu-item index="/manager/data"><el-icon>
+            <span>系统首页</span>
+          </el-menu-item>
+
+          <el-menu-item index="/manager/data">
+            <el-icon>
               <DataBoard />
             </el-icon>
-            <span>数据统计</span></el-menu-item>
+            <span>数据统计</span>
+          </el-menu-item>
+
+          <el-menu-item index="/manager/department">
+            <el-icon>
+              <School />
+            </el-icon>
+            <span>部门管理</span>
+          </el-menu-item>
+
           <el-sub-menu index="1">
             <template #title>
               <el-icon>
@@ -50,28 +61,170 @@
             <el-menu-item index="/manager/user">用户信息</el-menu-item>
             <el-menu-item index="/manager/employee">员工信息</el-menu-item>
           </el-sub-menu>
-          <el-menu-item index="/manager/info"><el-icon>
+
+          <el-menu-item index="/manager/info">
+            <el-icon>
               <UserFilled />
             </el-icon>
-            <span>个人信息</span></el-menu-item>
-          <el-menu-item index="/manager/exit"><el-icon>
+            <span>个人信息</span>
+          </el-menu-item>
+
+          <el-menu-item index="/manager/exit" class="exit-item">
+            <el-icon>
               <SwitchButton />
             </el-icon>
-            <span>退出登录</span></el-menu-item>
+            <span>退出登录</span>
+          </el-menu-item>
         </el-menu>
-      </div>
-      <!-- 左侧菜单栏 END -->
+      </aside>
 
-      <!-- 右侧内容区 START-->
-      <div style="flex: 1; width: 0; background-color: #f8f8ff; padding: 10px">
-        <RouterView />
-      </div>
-      <!-- 右侧内容区 END-->
+      <main class="main-content">
+        <div class="breadcrumb-container">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/manager/home' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>{{ currentRouteName }}</el-breadcrumb-item>
+          </el-breadcrumb>
+        </div>
+
+        <div class="router-view-box">
+          <RouterView />
+        </div>
+      </main>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from "vue";
 import router from "@/router";
 import { RouterView } from "vue-router";
+import { ArrowDown, House, DataBoard, User, UserFilled, SwitchButton } from "@element-plus/icons-vue";
+
+// 动态获取当前路由名称用于面包屑展示
+const currentRouteName = computed(() => {
+  const path = router.currentRoute.value.path;
+  if (path.includes('admin')) return '管理员管理';
+  if (path.includes('user')) return '用户管理';
+  if (path.includes('employee')) return '员工管理';
+  if (path.includes('data')) return '数据统计';
+  if (path.includes('department')) return '部门管理';
+  return '系统主页';
+});
 </script>
+
+<style scoped>
+/* 整体布局容器 */
+.main-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+}
+
+/* 头部样式：改为白色背景，增加精致阴影 */
+.main-header {
+  height: 64px;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  z-index: 10;
+}
+
+.logo-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-img {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2f3d;
+  letter-spacing: 1px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+
+.user-info:hover {
+  background: #f5f7fa;
+}
+
+.username {
+  margin: 0 8px;
+  font-size: 14px;
+  color: #606266;
+}
+
+/* 主内容包裹器 */
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  background-color: #f0f2f5;
+}
+
+/* 侧边栏样式 */
+.main-sidebar {
+  width: 220px;
+  background-color: #ffffff;
+  border-right: 1px solid #e6e6e6;
+  transition: all 0.3s;
+}
+
+.el-menu-vertical {
+  border: none !important;
+}
+
+/* 菜单激活态样式优化 */
+:deep(.el-menu-item.is-active) {
+  background-color: #ecf5ff !important;
+  border-right: 3px solid #409eff;
+}
+
+/* 内容区样式 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.breadcrumb-container {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+.router-view-box {
+  flex: 1;
+  /* 确保子组件填满 */
+}
+
+/* 退出登录项特别颜色 */
+.exit-item:hover {
+  color: #f56c6c !important;
+}
+</style>

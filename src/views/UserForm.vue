@@ -19,7 +19,6 @@ const pageTitle = computed(() => {
 const form = reactive({
   id: null,
   username: '',
-  password: '',
   email: '',
   status: 1,      // 默认正常
   admin: isTypeAdmin.value ? 1 : 0 // 根据入口自动设置权限位
@@ -28,8 +27,6 @@ const form = reactive({
 // 3. 表单校验规则
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  // 如果是新增模式，密码必填；如果是编辑模式，密码可选（不填则不修改）
-  password: [{ required: !route.query.id, message: '请输入密码', trigger: 'blur' }],
   email: [
     { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
   ]
@@ -49,8 +46,6 @@ const loadDetail = async (id) => {
     if (res.data.code === 200) {
       // 填充表单
       Object.assign(form, res.data.data)
-      // 回显时清空密码字段，防止误操作或泄露，不填则后端不做修改
-      form.password = ''
     }
   } catch (error) {
     ElMessage.error("获取详情失败")
