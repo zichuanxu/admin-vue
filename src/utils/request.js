@@ -21,11 +21,11 @@ request.interceptors.request.use(
       config.headers['Authorization'] = token
     }
 
-    // 如果是 JSON 格式请求，确保设置 Content-Type (Axios 默认通常就是 json，这里显示声明一下更稳妥)
-    if (!config.headers['Content-Type']) {
+    // 如果是 FormData (文件上传)，不要强制设置 Content-Type 为 json
+    // 让浏览器自动设置为 multipart/form-data 并带上 boundary
+    if (!config.headers['Content-Type'] && !(config.data instanceof FormData)) {
       config.headers['Content-Type'] = 'application/json'
     }
-
     return config
   },
   (error) => {
@@ -40,6 +40,12 @@ request.interceptors.response.use(
     // 2xx 范围内的状态码都会触发该函数
     // 这里的 response 是 Axios 封装的对象，response.data 才是后端返回的 Result
     const res = response.data
+
+
+    // 如果是二进制数据（文件流），直接返回，不进行 code 校验
+    if (response.config.responseType === 'blob' || res instanceof Blob) {
+      return res
+    }
 
     // 假设你的后端 Result 结构是 { code: 200, msg: "success", data: ... }
     // 如果 code 不是 200，说明业务逻辑有错

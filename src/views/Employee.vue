@@ -4,7 +4,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 const router = useRouter();
 import request from '@/utils/request'
-
+import { useUserStore } from '@/stores/user'
 const data = reactive({
   searchName: "", // 搜索关键词
   isSearching: false, // 标记当前是否处于搜索模式
@@ -192,6 +192,61 @@ const handleEdit = (row) => {
 const handleSelectionChange = (selection) => {
   data.selectedIds = selection.map((item) => item.id);
 };
+const handleExport = async () => {
+  const ids = data.selectedIds.length > 0 ? data.selectedIds : [];
+
+  const token = localStorage.getItem('token')
+
+  try {
+    const res = await request.post("/employee/export", ids, {
+      headers: { Authorization: token },
+      responseType: "blob" // 必须保留
+    })
+
+    const blob = new Blob([res]);
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `员工数据_${new Date().getTime()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error(error);
+    ElMessage.error("导出失败")
+  }
+};
+const handleImport = async (options) => {
+  const file = options.file;
+  // 校验文件类型，防止上传非Excel文件
+  const isExcel =
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    file.type === "application/vnd.ms-excel";
+  if (!isExcel) {
+    ElMessage.error("只能上传 xlsx/xls 文件");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const res = await request.post("/employee/import", formData);
+    if (res.code === 200) {
+      ElMessage.success("导入成功");
+      refreshAfterChange();
+    } else {
+      // 显示后端返回的具体错误信息
+      ElMessage.error(res.msg || "导入失败");
+    }
+  } catch (error) {
+    console.error(error);
+    ElMessage.error("网络异常或导入解析错误");
+  }
+};
 
 // 页面加载
 onMounted(() => {
@@ -214,6 +269,12 @@ onMounted(() => {
           <el-button type="warning" @click="reset">重置</el-button>
         </div>
         <div>
+          <el-upload action="" :http-request="handleImport" :show-file-list="false" accept=".xlsx, .xls"
+            style="display: inline-block; margin-right: 10px">
+            <el-button type="info">导入</el-button>
+          </el-upload>
+
+          <el-button type="warning" @click="handleExport">导出</el-button>
           <el-button type="danger" :disabled="data.selectedIds.length === 0" @click="handleBatchDelete">批量删除</el-button>
           <el-button type="success" @click="handleAdd">新增员工</el-button>
         </div>

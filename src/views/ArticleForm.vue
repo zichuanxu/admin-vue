@@ -5,9 +5,12 @@ import { ElMessage } from 'element-plus'
 import request from '@/utils/request'
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore()
+
 
 // 1. 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef()
@@ -94,6 +97,8 @@ onMounted(() => {
   const id = route.query.id
   if (id) {
     loadDetail(id)
+  } else {
+    form.author = userStore.user?.username || ''
   }
 })
 </script>
@@ -113,7 +118,7 @@ onMounted(() => {
         </el-form-item>
 
         <el-form-item label="作者">
-          <el-input v-model="form.author" placeholder="请输入作者"></el-input>
+          <el-input v-model="form.author" placeholder="请输入作者" :disabled="userStore.user?.admin !== 1"></el-input>
         </el-form-item>
 
         <el-form-item label="摘要">

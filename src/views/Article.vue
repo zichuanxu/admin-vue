@@ -3,8 +3,10 @@ import { reactive, onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import request from '@/utils/request';
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter();
+const userStore = useUserStore()
 
 const data = reactive({
   pageSize: 10,
@@ -153,8 +155,10 @@ onMounted(() => {
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="scope">
             <el-button size="small" type="success" link @click="handlePreview(scope.row)">预览</el-button>
-            <el-button size="small" type="primary" link @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" link @click="handleDelete(scope.row.id)">删除</el-button>
+            <el-button size="small" type="primary" link @click="handleEdit(scope.row)"
+              :disabled="userStore.user?.admin !== 1 && userStore.user?.username !== scope.row.author">编辑</el-button>
+            <el-button size="small" type="danger" link @click="handleDelete(scope.row.id)"
+              :disabled="userStore.user?.admin !== 1 && userStore.user?.username !== scope.row.author">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
