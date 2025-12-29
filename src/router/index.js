@@ -75,6 +75,16 @@ const router = createRouter({
         name: 'admin',
         component: () => import('@/views/Admin.vue'),
       },
+      {
+        path: 'article',
+        name: 'article',
+        component: () => import('@/views/Article.vue'),
+      },
+      {
+        path: 'article-form',
+        name: 'ArticleForm',
+        component: () => import('@/views/ArticleForm.vue'),
+      },
       ],
     },
     {

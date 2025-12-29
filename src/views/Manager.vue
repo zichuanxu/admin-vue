@@ -52,7 +52,15 @@
             <span>部门管理</span>
           </el-menu-item>
 
-          <el-sub-menu index="1" v-if="userStore.user?.admin === 1">
+          <el-menu-item index="/manager/article" ">
+            <el-icon>
+              <Document />
+            </el-icon>
+            <span>文章管理</span>
+          </el-menu-item>
+
+
+          <el-sub-menu index=" 1" v-if="userStore.user?.admin === 1">
             <template #title>
               <el-icon>
                 <User />
@@ -68,22 +76,22 @@
             <el-menu-item index="/manager/employee"><el-icon>
                 <User />
               </el-icon>员工信息</el-menu-item>
-          </el-sub-menu>
+            </el-sub-menu>
 
-          <el-menu-item index="/manager/info">
-            <el-icon>
-              <UserFilled />
-            </el-icon>
-            <span>个人信息</span>
-          </el-menu-item>
+            <el-menu-item index="/manager/info">
+              <el-icon>
+                <UserFilled />
+              </el-icon>
+              <span>个人信息</span>
+            </el-menu-item>
 
 
-          <el-menu-item index="/manager/password">
-            <el-icon>
-              <Edit />
-            </el-icon>
-            <span>修改密码</span>
-          </el-menu-item>
+            <el-menu-item index="/manager/password">
+              <el-icon>
+                <Edit />
+              </el-icon>
+              <span>修改密码</span>
+            </el-menu-item>
 
         </el-menu>
       </aside>
@@ -121,6 +129,7 @@ const currentRouteName = computed(() => {
   if (path.includes('employee')) return '员工管理';
   if (path.includes('data')) return '数据统计';
   if (path.includes('department')) return '部门管理';
+  if (path.includes('article')) return '文章管理';
   if (path.includes('info')) return '个人信息';
   if (path.includes('password')) return '修改密码';
   return '系统主页';
