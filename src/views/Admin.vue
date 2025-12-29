@@ -103,7 +103,7 @@ onMounted(() => {
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.status === 1 ? 'success' : 'primary'">{{ scope.row.status === 1 ? '正常' : '禁用'
-            }}</el-tag>
+              }}</el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="创建时间" />

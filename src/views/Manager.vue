@@ -70,6 +70,14 @@
             <span>个人信息</span>
           </el-menu-item>
 
+
+          <el-menu-item index="/manager/password">
+            <el-icon>
+              <Edit />
+            </el-icon>
+            <span>修改密码</span>
+          </el-menu-item>
+
         </el-menu>
       </aside>
 
@@ -107,6 +115,7 @@ const currentRouteName = computed(() => {
   if (path.includes('data')) return '数据统计';
   if (path.includes('department')) return '部门管理';
   if (path.includes('info')) return '个人信息';
+  if (path.includes('password')) return '修改密码';
   return '系统主页';
 });
 

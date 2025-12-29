@@ -63,7 +63,7 @@ const activities = ref([
             </div>
           </template>
           <div class="placeholder-chart">
-            <el-empty description="图表加载中...（建议接入 ECharts）" :image-size="100" />
+            <el-empty description="图表加载中..." :image-size="100" />
           </div>
         </el-card>
       </el-col>

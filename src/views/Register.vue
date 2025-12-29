@@ -206,7 +206,7 @@ const handleRegister = () => {
 :deep(.el-input__wrapper:hover),
 :deep(.el-input__wrapper.is-focus) {
   background-color: #fff;
-  box-shadow: 0 0 0 1px #764ba2 !important;
+  box-shadow: 0 0 0 1px #9f7bc3 !important;
   /* 注册页主色调微调 */
 }
 
@@ -218,7 +218,7 @@ const handleRegister = () => {
   border-radius: 8px;
   margin-top: 10px;
   letter-spacing: 1px;
-  background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+  background: linear-gradient(90deg, #ac89cf 0%, #5668b5 100%);
   /* 注册页按钮渐变 */
   border: none;
   box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3);
