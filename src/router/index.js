@@ -61,6 +61,11 @@ const router = createRouter({
         component: () => import('@/views/Info.vue')
       },
       {
+        path: 'info-form',
+        name: 'InfoForm',
+        component: () => import('@/views/InfoForm.vue')
+      },
+      {
         path: 'user',
         name: 'user',
         component: () => import('@/views/User.vue'),

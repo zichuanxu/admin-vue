@@ -8,27 +8,29 @@
 
       <div class="profile-header">
         <div class="header-left">
-          <div class="avatar-container">
-            <el-avatar :size="120" class="user-avatar"
-              src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-            <div class="avatar-edit-mask">
-              <el-icon>
-                <Camera />
-              </el-icon>
+          <el-upload class="avatar-uploader" action="http://localhost:8080/file/upload" :show-file-list="false"
+            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="uploadHeaders">
+            <div class="avatar-container">
+              <el-avatar :size="120" class="user-avatar"
+                :src="userInfo.avatarUrl || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" />
+
+              <div class="avatar-edit-mask">
+                <el-icon>
+                  <Camera />
+                </el-icon>
+              </div>
             </div>
-          </div>
+          </el-upload>
 
           <div class="user-identity">
             <div class="name-row">
               <h1 class="username">{{ userInfo.username || '未设置昵称' }}</h1>
-              <el-tag size="small" effect="dark" round class="role-tag">普通用户</el-tag>
             </div>
-            <p class="user-bio">{{ userInfo.bio || '这个人很懒，什么也没留下。' }}</p>
           </div>
         </div>
 
         <div class="header-actions">
-          <el-button type="primary" plain icon="Edit" round>编辑资料</el-button>
+          <el-button type="primary" plain icon="Edit" @click="router.push('/manager/info-form')" round>编辑资料</el-button>
           <el-button type="warning" plain icon="Lock" @click="router.push('/manager/password')" round>修改密码</el-button>
         </div>
       </div>
@@ -76,13 +78,65 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import request from '@/utils/request'
-import { Message, Calendar, Camera, User } from '@element-plus/icons-vue'
+import { Message, Calendar, Camera, User as UserIcon } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import router from '@/router'
+import { useUserStore } from '@/stores/user'
+
 
 const loading = ref(false)
 const userInfo = ref({})
+
+// 1. 处理上传请求头 (如果有Token验证)
+const uploadHeaders = computed(() => {
+  const userStore = useUserStore()
+  const token = userStore.token || localStorage.getItem('token')
+  return {
+    Authorization: token
+  }
+})
+
+// 2. 上传前的校验
+const beforeAvatarUpload = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('头像必须是 JPG 或 PNG 格式!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('头像大小不能超过 2MB!')
+    return false
+  }
+  return true
+}
+
+// 3. 上传成功后的回调
+const handleAvatarSuccess = (response, uploadFile) => {
+  // response 是后端 Result 对象
+  if (response.code === 200) {
+    const newAvatarUrl = response.data // 拿到图片URL
+
+    // 立即更新前端视图
+    userInfo.value.avatarUrl = newAvatarUrl
+
+    // 调用后端接口更新数据库中的头像字段
+    updateUserAvatar(newAvatarUrl)
+  } else {
+    ElMessage.error('上传失败: ' + response.msg)
+  }
+}
+
+// 4. 单独更新用户头像的函数
+const updateUserAvatar = async (url) => {
+  try {
+    // 调用我们在后端新加的接口，或者复用update接口
+    await request.post('/user/update-avatar', { avatarUrl: url })
+    ElMessage.success('头像更新成功')
+    // 也可以选择重新 loadInfo() 确保同步
+  } catch (error) {
+    console.error(error)
+  }
+}
 
 const loadInfo = async () => {
   loading.value = true
@@ -102,6 +156,8 @@ const formatTime = (timeStr) => {
   if (!timeStr) return '-'
   return timeStr.replace('T', ' ').substring(0, 10) // PC端一般不需要显示到秒，显示日期更简洁
 }
+
+
 
 onMounted(() => {
   loadInfo()
@@ -328,6 +384,12 @@ onMounted(() => {
 
   .user-bio {
     margin: 0 auto;
+  }
+
+  .avatar-uploader {
+    /* 确保上传组件本身不打乱原有布局 */
+    display: flex;
+    align-items: center;
   }
 }
 </style>

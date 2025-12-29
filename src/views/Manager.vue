@@ -9,7 +9,8 @@
       <div class="header-right">
         <el-dropdown trigger="click">
           <div class="user-info">
-            <el-avatar :size="35" src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif" />
+            <el-avatar :size="35"
+              :src="userStore.user?.avatarUrl || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'" />
             <span class="username">{{ userStore.user?.username || '用户' }}</span>
             <el-icon>
               <ArrowDown />
@@ -58,9 +59,15 @@
               </el-icon>
               <span>用户管理</span>
             </template>
-            <el-menu-item index="/manager/admin">管理员信息</el-menu-item>
-            <el-menu-item index="/manager/user">用户信息</el-menu-item>
-            <el-menu-item index="/manager/employee">员工信息</el-menu-item>
+            <el-menu-item index="/manager/admin"><el-icon>
+                <User />
+              </el-icon>管理员信息</el-menu-item>
+            <el-menu-item index="/manager/user"><el-icon>
+                <User />
+              </el-icon>用户信息</el-menu-item>
+            <el-menu-item index="/manager/employee"><el-icon>
+                <User />
+              </el-icon>员工信息</el-menu-item>
           </el-sub-menu>
 
           <el-menu-item index="/manager/info">

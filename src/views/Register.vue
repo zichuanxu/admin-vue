@@ -40,7 +40,7 @@
 
           <div class="form-footer">
             <span>已有账号？</span>
-            <el-link type="primary" :underline="false" @click="$router.push('/login')">
+            <el-link type="primary" @click="$router.push('/login')">
               去登录
             </el-link>
           </div>
@@ -233,7 +233,6 @@ const handleRegister = () => {
 .form-footer {
   margin-top: 20px;
   text-align: center;
-  font-size: 14px;
   color: #666;
 }
 

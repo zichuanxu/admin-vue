@@ -34,7 +34,7 @@
 
           <div class="form-footer">
             <span>还没有账号？</span>
-            <el-link type="primary" :underline="false" @click="$router.push('/register')">
+            <el-link type="primary" @click="$router.push('/register')">
               立即注册
             </el-link>
           </div>
@@ -88,7 +88,8 @@ const handleLogin = () => {
             const userInfo = {
               username: decoded.username,
               id: decoded.aud ? decoded.aud[0] : null,
-              admin: decoded.admin
+              admin: decoded.admin,
+              avatarUrl: decoded.avatarUrl || ''
             }
             userStore.setUser(userInfo)
             ElMessage.success('登录成功')
@@ -228,7 +229,6 @@ const handleLogin = () => {
 .form-footer {
   margin-top: 20px;
   text-align: center;
-  font-size: 14px;
   color: #666;
 }
 

@@ -3,34 +3,74 @@ import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
+// 1. 新增引入：图标和 UserStore
+import { ArrowLeft, Camera } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
 
 const route = useRoute()
 const router = useRouter()
 const formRef = ref(null)
+const userStore = useUserStore() // 2. 初始化 userStore
 
-// 1. 获取业务类型：是管理员还是普通用户
+// 获取业务类型及标题
 const isTypeAdmin = computed(() => route.query.type === 'admin')
 const pageTitle = computed(() => {
   const role = isTypeAdmin.value ? '管理员' : '用户'
   return `编辑${role}信息`
 })
 
-// 2. 定义表单数据 (与 User 实体类对应)
+// 3. 定义表单数据 (增加 avatarUrl)
 const form = reactive({
   id: null,
   username: '',
   email: '',
-  status: 1,      // 默认正常
-  admin: isTypeAdmin.value ? 1 : 0 // 根据入口自动设置权限位
+  avatarUrl: '', // 新增
+  status: 1,
+  admin: isTypeAdmin.value ? 1 : 0
 })
 
-// 3. 表单校验规则
+// 表单校验规则
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   email: [
-    { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' }
+    { type: 'email', message: '请输入正确的邮箱格式', trigger: ['blur', 'change'] }
   ]
 }
+
+// --- 4. 新增：上传相关逻辑 (参照范例) ---
+
+// 计算上传Header (用于鉴权)
+const uploadHeaders = computed(() => {
+  const token = userStore.token || localStorage.getItem('token')
+  return {
+    Authorization: token
+  }
+})
+
+// 上传前校验
+const beforeAvatarUpload = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('头像必须是 JPG 或 PNG 格式!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('头像大小不能超过 2MB!')
+    return false
+  }
+  return true
+}
+
+// 上传成功回调
+const handleAvatarSuccess = (response) => {
+  if (response.code === 200) {
+    // 更新表单视图中的 avatarUrl
+    form.avatarUrl = response.data
+    ElMessage.success('头像上传成功')
+  } else {
+    ElMessage.error('上传失败: ' + response.msg)
+  }
+}
+
+// --- 业务逻辑 ---
 
 onMounted(async () => {
   const id = route.query.id
@@ -44,7 +84,7 @@ const loadDetail = async (id) => {
   try {
     const res = await request.get(`/user/${id}`)
     if (res.code === 200) {
-      // 填充表单
+      // 填充表单 (如果后端返回数据包含 avatarUrl，会自动填充)
       Object.assign(form, res.data)
     }
   } catch (error) {
@@ -57,11 +97,11 @@ const save = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
       try {
+        // 提交时会带上最新的 avatarUrl
         const res = await request.put('/user', form)
 
         if (res.code === 200) {
           ElMessage.success("操作成功")
-          // 根据当前类型跳回对应的列表页
           const targetPath = isTypeAdmin.value ? '/manager/admin' : '/manager/user'
           router.push(targetPath)
         } else {
@@ -94,6 +134,26 @@ const cancel = () => router.back()
       </div>
 
       <el-form :model="form" :rules="rules" ref="formRef" label-position="top" class="modern-form" size="large">
+
+        <div class="avatar-upload-section">
+          <el-upload class="avatar-uploader" action="http://localhost:8080/file/upload" :show-file-list="false"
+            :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :headers="uploadHeaders">
+            <div class="avatar-wrapper">
+              <el-avatar :size="100"
+                :src="form.avatarUrl || 'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png'"
+                class="user-avatar" />
+              <div class="upload-mask">
+                <el-icon>
+                  <Camera />
+                </el-icon>
+                <span>更换</span>
+              </div>
+            </div>
+          </el-upload>
+          <span class="avatar-tip">点击修改头像</span>
+        </div>
+
+
         <el-row :gutter="40">
           <el-col :span="12">
             <el-form-item label="用户名" prop="username">
@@ -141,7 +201,7 @@ const cancel = () => router.back()
 </template>
 
 <style scoped>
-/* --- 页面整体布局 (复用 Department 页样式，保持统一) --- */
+/* --- 页面整体布局 --- */
 .page-wrapper {
   padding: 40px;
   background-color: #f5f7fa;
@@ -155,7 +215,6 @@ const cancel = () => router.back()
   background: #ffffff;
   width: 100%;
   max-width: 800px;
-  /* 稍微宽一点，因为是双栏布局 */
   padding: 40px 50px;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
@@ -164,6 +223,9 @@ const cancel = () => router.back()
 /* --- 头部样式 --- */
 .header-section {
   margin-bottom: 30px;
+  /* 增加底部间距，为头像留出空间 */
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f2f3f5;
 }
 
 .title-row {
@@ -206,6 +268,67 @@ const cancel = () => router.back()
   color: #909399;
 }
 
+/* --- 1. 新增：头像区域样式 --- */
+.avatar-upload-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+  /* 与下方表单拉开距离 */
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  cursor: pointer;
+  /* 增加一点阴影和边框让它更突出 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 3px solid #fff;
+  transition: all 0.3s ease;
+}
+
+.avatar-wrapper:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.upload-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  /* 增加毛玻璃效果 */
+  backdrop-filter: blur(1px);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.upload-mask .el-icon {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.upload-mask span {
+  font-size: 12px;
+}
+
+.avatar-wrapper:hover .upload-mask {
+  opacity: 1;
+}
+
+.avatar-tip {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #909399;
+}
+
 /* --- 表单样式微调 --- */
 .modern-form {
   margin-top: 20px;
@@ -217,12 +340,10 @@ const cancel = () => router.back()
   padding-bottom: 8px !important;
 }
 
-/* 静态值显示框（用于Tag） */
 .static-value-box {
   display: flex;
   align-items: center;
   height: 40px;
-  /* 与 Input 高度一致 */
 }
 
 .read-only-tip {
@@ -231,7 +352,6 @@ const cancel = () => router.back()
   margin-left: 10px;
 }
 
-/* Radio 样式优化 */
 .radio-box {
   height: 40px;
   display: flex;
@@ -240,13 +360,13 @@ const cancel = () => router.back()
 
 /* --- 按钮区 --- */
 .form-footer {
-  margin-top: 40px;
+  margin-top: 20px;
+  /* 稍微减小与上方表单项的间距 */
   display: flex;
   justify-content: flex-end;
   gap: 12px;
   padding-top: 20px;
   border-top: 1px solid #f2f3f5;
-  /* 增加一条极淡的分割线 */
 }
 
 .btn-save {

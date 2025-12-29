@@ -1,16 +1,16 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, markRaw } from 'vue';
 import { User, Memo, DataLine, Bell, Timer } from '@element-plus/icons-vue';
-
-// 模拟当前用户信息和统计数据
-const username = ref("管理员");
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+const username = userStore.user?.username || '用户';
 const currentTime = ref(new Date().toLocaleDateString());
 
 const stats = reactive([
-  { title: '用户总数', value: '1,284', icon: User, color: '#409EFF', growth: '+12%' },
-  { title: '今日访问', value: '356', icon: DataLine, color: '#67C23A', growth: '+5%' },
-  { title: '待办任务', value: '12', icon: Memo, color: '#E6A23C', growth: '-2' },
-  { title: '系统预警', value: '0', icon: Bell, color: '#F56C6C', growth: '平稳' }
+  { title: '用户总数', value: '1,284', icon: markRaw(User), color: '#409EFF', growth: '+12%' },
+  { title: '今日访问', value: '356', icon: markRaw(DataLine), color: '#67C23A', growth: '+5%' },
+  { title: '待办任务', value: '12', icon: markRaw(Memo), color: '#E6A23C', growth: '-2' },
+  { title: '系统预警', value: '0', icon: markRaw(Bell), color: '#F56C6C', growth: '平稳' }
 ]);
 
 const activities = ref([
@@ -25,7 +25,7 @@ const activities = ref([
     <el-card class="welcome-card" shadow="never">
       <div class="welcome-content">
         <div class="welcome-text">
-          <h2>早安，{{ username }}！☕</h2>
+          <h2>你好，{{ username }}！</h2>
           <p>今天是 {{ currentTime }}，欢迎回到后台管理系统。系统目前运行状态极佳，一切尽在掌握。</p>
         </div>
         <img src="https://img.icons8.com/fluency/144/checked-user-male.png" class="welcome-img" />
