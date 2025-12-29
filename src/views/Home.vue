@@ -1,11 +1,14 @@
 <script setup>
-import { ref, reactive, markRaw } from 'vue';
-import { User, Memo, DataLine, Bell, Timer } from '@element-plus/icons-vue';
+import { ref, reactive, markRaw, onMounted, onUnmounted, nextTick } from 'vue';
+import { User, Memo, DataLine, Bell } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/user'
+import * as echarts from 'echarts'; // 引入 ECharts
+
 const userStore = useUserStore()
 const username = userStore.user?.username || '用户';
 const currentTime = ref(new Date().toLocaleDateString());
 
+// 统计卡片数据
 const stats = reactive([
   { title: '用户总数', value: '1,284', icon: markRaw(User), color: '#409EFF', growth: '+12%' },
   { title: '今日访问', value: '356', icon: markRaw(DataLine), color: '#67C23A', growth: '+5%' },
@@ -13,11 +16,107 @@ const stats = reactive([
   { title: '系统预警', value: '0', icon: markRaw(Bell), color: '#F56C6C', growth: '平稳' }
 ]);
 
+// 动态列表数据
 const activities = ref([
   { content: '新管理员 "Alice" 已通过审核', timestamp: '2025-12-29 09:30', type: 'success' },
   { content: '系统数据库完成例行备份', timestamp: '2025-12-29 04:00', type: 'primary' },
   { content: '检测到异常登录 IP: 192.168.1.1', timestamp: '2025-12-28 22:15', type: 'warning' },
 ]);
+
+// --- 图表相关逻辑 ---
+const chartRef = ref(null); // 图表 DOM 引用
+let myChart = null;         // 图表实例
+
+const initChart = () => {
+  if (!chartRef.value) return;
+
+  myChart = echarts.init(chartRef.value);
+
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      padding: [10, 15],
+      textStyle: { color: '#333' },
+      axisPointer: { type: 'line', lineStyle: { type: 'dashed' } }
+    },
+    grid: {
+      top: '15%',
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: { color: '#909399' }
+    },
+    yAxis: {
+      type: 'value',
+      splitLine: { lineStyle: { type: 'dashed', color: '#E4E7ED' } }, // 虚线网格更现代
+      axisLabel: { color: '#909399' }
+    },
+    legend: {
+      data: ['访问量', '新增用户'],
+      right: 10,
+      textStyle: { color: '#909399' }
+    },
+    series: [
+      {
+        name: '访问量',
+        type: 'line',
+        smooth: true, // 平滑曲线
+        symbol: 'none', // 去掉折点圆圈，更简洁
+        lineStyle: { width: 3, color: '#409EFF' },
+        areaStyle: {
+          // 线性渐变填充
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+            { offset: 1, color: 'rgba(64, 158, 255, 0.01)' }
+          ])
+        },
+        data: [120, 132, 101, 134, 290, 230, 310]
+      },
+      {
+        name: '新增用户',
+        type: 'line',
+        smooth: true,
+        symbol: 'none',
+        lineStyle: { width: 3, color: '#67C23A' },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(103, 194, 58, 0.3)' },
+            { offset: 1, color: 'rgba(103, 194, 58, 0.01)' }
+          ])
+        },
+        data: [20, 32, 21, 54, 90, 130, 110]
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+};
+
+// 监听窗口大小变化，实现图表自适应
+const handleResize = () => {
+  myChart && myChart.resize();
+};
+
+onMounted(() => {
+  nextTick(() => {
+    initChart();
+    window.addEventListener('resize', handleResize);
+  });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+  if (myChart) myChart.dispose();
+});
 </script>
 
 <template>
@@ -58,13 +157,13 @@ const activities = ref([
         <el-card shadow="never" class="main-chart-card">
           <template #header>
             <div class="card-header">
-              <span><b>系统数据概览</b></span>
-              <el-tag type="info">近7日</el-tag>
+              <div class="header-left">
+                <span><b>系统数据概览</b></span>
+              </div>
+              <el-tag effect="plain" round>近7日</el-tag>
             </div>
           </template>
-          <div class="placeholder-chart">
-            <el-empty description="图表加载中..." :image-size="100" />
-          </div>
+          <div ref="chartRef" class="chart-container"></div>
         </el-card>
       </el-col>
 
@@ -91,7 +190,6 @@ const activities = ref([
 <style scoped>
 .home-container {
   padding: 8px;
-  /* 增加呼吸感 */
 }
 
 /* 欢迎卡片样式 */
@@ -189,13 +287,9 @@ const activities = ref([
   min-height: 400px;
 }
 
-.placeholder-chart {
-  height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fcfcfc;
-  border: 1px dashed #e6e6e6;
-  border-radius: 8px;
+/* 修改：为图表容器设置固定高度 */
+.chart-container {
+  height: 330px;
+  width: 100%;
 }
 </style>

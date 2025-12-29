@@ -2,7 +2,7 @@
   <div class="main-container">
     <el-header class="main-header">
       <div class="logo-box">
-        <img src="/admin-panel.png" class="logo-img" />
+        <img src="/admin.png" class="logo-img" />
         <span class="logo-text">后台管理系统</span>
       </div>
 
