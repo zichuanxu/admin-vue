@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
 import { ElMessage } from 'element-plus'
+import request from '@/utils/request'
 
 const route = useRoute()
 const router = useRouter()
@@ -42,9 +42,9 @@ onMounted(async () => {
 // 获取所有部门
 const loadDepartments = async () => {
   try {
-    const res = await axios.get('/api/department/all')
-    if (res.data.code === 200) {
-      deptList.value = res.data.data // 结构为 [{id: 1, name: '开发部', ...}, ...]
+    const res = await request.get('/department/all')
+    if (res.code === 200) {
+      deptList.value = res.data // 结构为 [{id: 1, name: '开发部', ...}, ...]
     }
   } catch (error) {
     ElMessage.error("获取部门列表失败")
@@ -54,10 +54,10 @@ const loadDepartments = async () => {
 // 获取员工详情（回显）
 const loadDetail = async (id) => {
   try {
-    const res = await axios.get(`/api/employee/${id}`)
-    if (res.data.code === 200) {
+    const res = await request.get(`/employee/${id}`)
+    if (res.code === 200) {
       // 使用 Object.assign 将后端返回的数据填充到响应式对象 form 中
-      Object.assign(form, res.data.data)
+      Object.assign(form, res.data)
     }
   } catch (error) {
     ElMessage.error("获取详情失败")
@@ -70,10 +70,10 @@ const save = () => {
     if (valid) {
       try {
         const res = form.id
-          ? await axios.put('/api/employee/update', form)
-          : await axios.post('/api/employee/add', form)
+          ? await request.put('/employee/update', form)
+          : await request.post('/employee/add', form)
 
-        if (res.data.code === 200) {
+        if (res.code === 200) {
           ElMessage.success("操作成功")
           router.push('/manager/employee') // 跳转回列表页
         }

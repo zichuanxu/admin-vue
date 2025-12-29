@@ -1,9 +1,9 @@
 <script setup>
 import { reactive, onMounted } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 const router = useRouter();
+import request from '@/utils/request'
 
 const data = reactive({
   pageSize: 10,
@@ -16,16 +16,16 @@ const data = reactive({
 // 加载数据：只查询管理员 (admin=true)
 const load = async () => {
   try {
-    const res = await axios.get("/api/user/all", {
+    const res = await request.get("/user/all", {
       params: {
         pageNum: data.currentPage,
         pageSize: data.pageSize,
         admin: true
       },
     });
-    if (res.data.code === 200) {
-      data.tableData = res.data.data.records;
-      data.total = res.data.data.total;
+    if (res.code === 200) {
+      data.tableData = res.data.records;
+      data.total = res.data.total;
     }
   } catch (error) {
     ElMessage.error("获取管理员数据失败");
@@ -46,8 +46,8 @@ const handleDelete = (id) => {
     type: "warning",
   }).then(async () => {
     try {
-      const res = await axios.delete(`/api/user/${id}`);
-      if (res.data.code === 200) {
+      const res = await request.delete(`/user/${id}`);
+      if (res.code === 200) {
         ElMessage.success("删除成功");
         refreshAfterChange();
       }
@@ -65,8 +65,8 @@ const handleBatchDelete = () => {
     type: "danger",
   }).then(async () => {
     try {
-      const res = await axios.post("/api/user/delete/batch", data.selectedIds);
-      if (res.data.code === 200) {
+      const res = await request.post("/user/delete/batch", data.selectedIds);
+      if (res.code === 200) {
         ElMessage.success("批量删除成功");
         data.selectedIds = [];
         refreshAfterChange();

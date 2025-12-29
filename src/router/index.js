@@ -1,8 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    { path: '/login', component: () => import('@/views/Login.vue') },
+    { path: '/register', component: () => import('@/views/Register.vue') },
     {
       path: '/',
       redirect: '/manager/home',
@@ -10,6 +13,7 @@ const router = createRouter({
     {
       path: '/manager',
       name: 'manager',
+      meta: { requiresAuth: true },
       component: () => import('@/views/Manager.vue'),
       children: [{
         path: 'home',
@@ -46,7 +50,11 @@ const router = createRouter({
         name: 'UserForm',
         component: () => import('@/views/UserForm.vue')
       },
-
+      {
+        path: 'info',
+        name: 'info',
+        component: () => import('@/views/Info.vue')
+      },
       {
         path: 'user',
         name: 'user',
@@ -69,6 +77,23 @@ const router = createRouter({
       redirect: '/404',
     },
   ],
+})
+
+router.beforeEach((to, from, next) => {
+  const userStore = useUserStore()
+
+  // 1. 检查是否需要登录
+  if (to.meta.requiresAuth && !userStore.token) {
+    return next('/login')
+  }
+
+  // 2. 检查是否需要管理员权限
+  if (to.meta.requiresAdmin && !userStore.isAdmin()) {
+    alert('无权访问')
+    return next(from.path || '/')
+  }
+
+  next()
 })
 
 export default router

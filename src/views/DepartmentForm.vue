@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
@@ -36,8 +36,8 @@ onMounted(async () => {
 // 获取部门详情（用于编辑回显）
 const loadDetail = async (id) => {
   try {
-    const res = await axios.get(`/api/department/${id}`)
-    if (res.data.code === 200) {
+    const res = await request.get(`/department/${id}`)
+    if (res.code === 200) {
       Object.assign(form, res.data.data)
     }
   } catch (error) {
@@ -52,8 +52,8 @@ const save = () => {
       try {
         // 根据是否有 ID 判断是 PUT (修改) 还是 POST (新增)
         const res = form.id
-          ? await axios.put('/api/department', form)
-          : await axios.post('/api/department', form)
+          ? await request.put('/department', form)
+          : await request.post('/department', form)
 
         if (res.data.code === 200) {
           ElMessage.success("保存成功")

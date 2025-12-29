@@ -1,9 +1,9 @@
 <script setup>
 import { reactive, onMounted, computed } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 const router = useRouter();
+import request from '@/utils/request'
 
 const data = reactive({
   searchName: "",      // 搜索关键词
@@ -35,12 +35,12 @@ const load = async () => {
     return;
   }
   try {
-    const res = await axios.get("/api/department/page", {
+    const res = await request.get("/department/page", {
       params: { pageNum: data.currentPage, pageSize: data.pageSize },
     });
-    if (res.data.code === 200) {
-      data.tableData = res.data.data.records;
-      data.total = res.data.data.total;
+    if (res.code === 200) {
+      data.tableData = res.data.records;
+      data.total = res.data.total;
     }
   } catch (error) {
     ElMessage.error("获取数据失败");
@@ -57,9 +57,9 @@ const handleSearch = async () => {
 
   if (data.allTableData.length === 0) {
     try {
-      const res = await axios.get("/api/department/all");
-      if (res.data.code === 200) {
-        data.allTableData = res.data.data;
+      const res = await request.get("/department/all");
+      if (res.code === 200) {
+        data.allTableData = res.data;
       }
     } catch (error) {
       ElMessage.error("获取全量数据失败");
@@ -96,8 +96,8 @@ const refreshAfterChange = () => {
 
 const handleDelete = (id) => {
   ElMessageBox.confirm("确定要删除该部门吗？", "提示", { type: "warning" }).then(async () => {
-    const res = await axios.delete(`/api/department/${id}`);
-    if (res.data.code === 200) {
+    const res = await request.delete(`/department/${id}`);
+    if (res.code === 200) {
       ElMessage.success("删除成功");
       refreshAfterChange();
     }
@@ -107,8 +107,8 @@ const handleDelete = (id) => {
 const handleBatchDelete = () => {
   if (data.selectedIds.length === 0) return;
   ElMessageBox.confirm(`确定删除选中的 ${data.selectedIds.length} 个部门吗？`, "警告", { type: "danger" }).then(async () => {
-    const res = await axios.post("/api/department/delete/batch", data.selectedIds);
-    if (res.data.code === 200) {
+    const res = await request.post("/department/delete/batch", data.selectedIds);
+    if (res.code === 200) {
       ElMessage.success("批量删除成功");
       data.selectedIds = [];
       refreshAfterChange();

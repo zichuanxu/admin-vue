@@ -1,9 +1,9 @@
 <script setup>
 import { reactive, onMounted, computed } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 const router = useRouter();
+import request from '@/utils/request'
 
 const data = reactive({
   searchName: "", // 搜索关键词
@@ -45,12 +45,12 @@ const load = async () => {
 
   // 正常分页请求（初次进入页面或重置后）
   try {
-    const res = await axios.get("/api/employee/page", {
+    const res = await request.get("/employee/page", {
       params: { pageNum: data.currentPage, pageSize: data.pageSize },
     });
-    if (res.data.code === 200) {
-      data.tableData = res.data.data.records;
-      data.total = res.data.data.total;
+    if (res.code === 200) {
+      data.tableData = res.data.records;
+      data.total = res.data.total;
     }
   } catch (error) {
     ElMessage.error("获取数据失败");
@@ -69,9 +69,9 @@ const handleSearch = async () => {
   // 第一次点击搜索：如果缓存为空，则请求全量接口
   if (data.allTableData.length === 0) {
     try {
-      const res = await axios.get("/api/employee/all");
-      if (res.data.code === 200) {
-        data.allTableData = res.data.data;
+      const res = await request.get("/employee/all");
+      if (res.code === 200) {
+        data.allTableData = res.data;
       }
     } catch (error) {
       ElMessage.error("获取全量数据失败");
@@ -134,12 +134,12 @@ const handleDelete = (id) => {
   }).then(async () => {
     try {
       // 对齐后端接口：DELETE /employee/{id}
-      const res = await axios.delete(`/api/employee/${id}`);
-      if (res.data.code === 200) {
+      const res = await request.delete(`/employee/${id}`);
+      if (res.code === 200) {
         ElMessage.success("删除成功");
         refreshAfterChange();
       } else {
-        ElMessage.error(res.data.msg || "删除失败");
+        ElMessage.error(res.msg || "删除失败");
       }
     } catch (error) {
       ElMessage.error("系统错误，删除失败");
@@ -160,14 +160,14 @@ const handleBatchDelete = () => {
   }).then(async () => {
     try {
       // 对齐后端接口：POST /employee/delete/batch
-      // 注意：axios.post 的第二个参数是请求体(Body)
-      const res = await axios.post("/api/employee/delete/batch", data.selectedIds);
-      if (res.data.code === 200) {
+      // 注意：request.post 的第二个参数是请求体(Body)
+      const res = await request.post("/employee/delete/batch", data.selectedIds);
+      if (res.code === 200) {
         ElMessage.success("批量删除成功");
         data.selectedIds = []; // 清空选中列表
         refreshAfterChange();
       } else {
-        ElMessage.error(res.data.msg || "批量删除失败");
+        ElMessage.error(res.msg || "批量删除失败");
       }
     } catch (error) {
       ElMessage.error("系统错误，批量删除失败");

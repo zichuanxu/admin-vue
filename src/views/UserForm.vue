@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '@/utils/request'
 import { ElMessage } from 'element-plus'
 
 const route = useRoute()
@@ -42,10 +42,10 @@ onMounted(async () => {
 // 获取用户详情（回显）
 const loadDetail = async (id) => {
   try {
-    const res = await axios.get(`/api/user/${id}`)
-    if (res.data.code === 200) {
+    const res = await request.get(`/user/${id}`)
+    if (res.code === 200) {
       // 填充表单
-      Object.assign(form, res.data.data)
+      Object.assign(form, res.data)
     }
   } catch (error) {
     ElMessage.error("获取详情失败")
@@ -58,16 +58,16 @@ const save = () => {
     if (valid) {
       try {
         // 根据是否有 ID 判断是 PUT (修改) 还是 POST (新增)
-        await axios.put('/api/user', form)
+        await request.put('/user', form)
 
 
-        if (res.data.code === 200) {
+        if (res.code === 200) {
           ElMessage.success("操作成功")
           // 根据当前类型跳回对应的列表页
           const targetPath = isTypeAdmin.value ? '/manager/admin' : '/manager/user'
           router.push(targetPath)
         } else {
-          ElMessage.error(res.data.msg || "提交失败")
+          ElMessage.error(res.msg || "提交失败")
         }
       } catch (error) {
         ElMessage.error("系统错误")

@@ -1,9 +1,9 @@
 <script setup>
 import { reactive, onMounted, computed } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 const router = useRouter();
+import request from '@/utils/request'
 
 const data = reactive({
   searchName: "",
@@ -26,26 +26,26 @@ const filteredData = computed(() => {
   );
 });
 
-// 2. 加载逻辑：对接 /api/user/all
+// 2. 加载逻辑：对接 /user/all
 const load = async () => {
   if (data.isSearching) {
     localPaging();
     return;
   }
   try {
-    const res = await axios.get("/api/user/all", {
+    const res = await request.get("/user/all", {
       params: { pageNum: data.currentPage, pageSize: data.pageSize, admin: false }
     });
-    if (res.data.code === 200) {
-      data.tableData = res.data.data.records;
-      data.total = res.data.data.total;
+    if (res.code === 200) {
+      data.tableData = res.data.records;
+      data.total = res.data.total;
     }
   } catch (error) {
     ElMessage.error("加载失败");
   }
 };
 
-// 3. 搜索逻辑：对接 /api/user/all-users
+// 3. 搜索逻辑：对接 /user/all-users
 const handleSearch = async () => {
   if (!data.searchName) {
     data.isSearching = false;
@@ -56,9 +56,9 @@ const handleSearch = async () => {
   // 如果没有缓存过全量数据，则请求接口
   if (data.allTableData.length === 0) {
     try {
-      const res = await axios.get("/api/user/all-users", { params: { admin: false } });
-      if (res.data.code === 200) {
-        data.allTableData = res.data.data;
+      const res = await request.get("/user/all-users", { params: { admin: false } });
+      if (res.code === 200) {
+        data.allTableData = res.data;
       }
     } catch (error) {
       ElMessage.error("获取全量数据失败");
@@ -93,8 +93,8 @@ const refreshAfterChange = () => {
 
 const handleDelete = (id) => {
   ElMessageBox.confirm("确定删除吗？", "提示", { type: "warning" }).then(async () => {
-    const res = await axios.delete(`/api/user/${id}`);
-    if (res.data.code === 200) {
+    const res = await request.delete(`/user/${id}`);
+    if (res.code === 200) {
       ElMessage.success("已删除");
       refreshAfterChange();
     }
@@ -104,8 +104,8 @@ const handleDelete = (id) => {
 const handleBatchDelete = () => {
   if (data.selectedIds.length === 0) return;
   ElMessageBox.confirm(`确定删除选中的 ${data.selectedIds.length} 项吗？`, "警告", { type: "danger" }).then(async () => {
-    const res = await axios.post("/api/user/delete/batch", data.selectedIds);
-    if (res.data.code === 200) {
+    const res = await request.post("/user/delete/batch", data.selectedIds);
+    if (res.code === 200) {
       ElMessage.success("批量删除成功");
       data.selectedIds = [];
       refreshAfterChange();

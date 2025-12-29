@@ -10,7 +10,7 @@
         <el-dropdown trigger="click">
           <div class="user-info">
             <el-avatar :size="35" src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif" />
-            <span class="username">管理员</span>
+            <span class="username">{{ userStore.user?.username || '用户' }}</span>
             <el-icon>
               <ArrowDown />
             </el-icon>
@@ -18,14 +18,14 @@
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="router.push('/manager/info')">个人信息</el-dropdown-item>
-              <el-dropdown-item divided @click="router.push('/manager/exit')">退出登录</el-dropdown-item>
+              <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
       </div>
     </el-header>
 
-    <div class="content-wrapper">
+    <div class=" content-wrapper">
       <aside class="main-sidebar">
         <el-menu router :default-active="router.currentRoute.value.path" class="el-menu-vertical"
           :default-openeds="['1']">
@@ -43,14 +43,15 @@
             <span>数据统计</span>
           </el-menu-item>
 
-          <el-menu-item index="/manager/department">
+
+          <el-menu-item index="/manager/department" v-if="userStore.user?.admin === 1">
             <el-icon>
               <School />
             </el-icon>
             <span>部门管理</span>
           </el-menu-item>
 
-          <el-sub-menu index="1">
+          <el-sub-menu index="1" v-if="userStore.user?.admin === 1">
             <template #title>
               <el-icon>
                 <User />
@@ -69,12 +70,6 @@
             <span>个人信息</span>
           </el-menu-item>
 
-          <el-menu-item index="/manager/exit" class="exit-item">
-            <el-icon>
-              <SwitchButton />
-            </el-icon>
-            <span>退出登录</span>
-          </el-menu-item>
         </el-menu>
       </aside>
 
@@ -99,6 +94,9 @@ import { computed } from "vue";
 import router from "@/router";
 import { RouterView } from "vue-router";
 import { ArrowDown, House, DataBoard, User, UserFilled, SwitchButton } from "@element-plus/icons-vue";
+import { useUserStore } from '@/stores/user'
+import { ElMessageBox, ElMessage } from 'element-plus'
+
 
 // 动态获取当前路由名称用于面包屑展示
 const currentRouteName = computed(() => {
@@ -108,8 +106,25 @@ const currentRouteName = computed(() => {
   if (path.includes('employee')) return '员工管理';
   if (path.includes('data')) return '数据统计';
   if (path.includes('department')) return '部门管理';
+  if (path.includes('info')) return '个人信息';
   return '系统主页';
 });
+
+const userStore = useUserStore()
+
+const handleLogout = () => {
+  ElMessageBox.confirm('确定退出登录吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    // 调用我们在 Pinia 里写好的 logout 方法
+    await userStore.logout()
+    ElMessage.success('退出成功')
+  }).catch(() => {
+    // 取消操作
+  })
+}
 </script>
 
 <style scoped>
