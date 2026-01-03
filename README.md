@@ -1,141 +1,141 @@
 # admin-vue
 
-基于Vue3+SpringBoot3的企业级管理系统前端项目，提供完整的用户权限管理和业务数据管理功能。
+An enterprise-level management system frontend project based on Vue3 + SpringBoot3, providing comprehensive user permission management and business data management functionality.
 
-## 📋 项目简介
+## 📋 Project Overview
 
-这是一个现代化的企业级管理系统前端，采用Vue3 + Element Plus构建，实现了用户认证、权限控制、数据统计、部门管理、文章管理、员工管理等核心功能。系统界面美观、交互友好，适用于中小型企业的日常管理需求。
+This is a modern enterprise-level management system frontend built with Vue3 + Element Plus, implementing core features including user authentication, permission control, data statistics, department management, article management, employee management, and more. The system features an elegant interface with user-friendly interactions, suitable for daily management needs of small to medium-sized enterprises.
 
-## 🛠 技术栈
+## 🛠 Tech Stack
 
-- **前端框架**: Vue 3
-- **UI组件库**: Element Plus
-- **状态管理**: Pinia
-- **路由管理**: Vue Router 4
-- **HTTP客户端**: Axios
-- **图表库**: ECharts
-- **富文本编辑器**: WangEditor
-- **构建工具**: Vite
-- **认证**: JWT Token
+- **Frontend Framework**: Vue 3
+- **UI Component Library**: Element Plus
+- **State Management**: Pinia
+- **Routing**: Vue Router 4
+- **HTTP Client**: Axios
+- **Chart Library**: ECharts
+- **Rich Text Editor**: WangEditor
+- **Build Tool**: Vite
+- **Authentication**: JWT Token
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 环境要求
+### Requirements
 
 - Node.js ^20.19.0 || >=22.12.0
-- npm 或 yarn
+- npm or yarn
 
-### 安装依赖
+### Install Dependencies
 
 ```sh
 npm install
 ```
 
-### 开发环境运行
+### Development
 
 ```sh
 npm run dev
 ```
 
-### 生产环境构建
+### Production Build
 
 ```sh
 npm run build
 ```
 
-### 预览构建结果
+### Preview Build
 
 ```sh
 npm run preview
 ```
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 src/
-├── assets/         # 静态资源
-├── components/     # 公共组件
-├── router/         # 路由配置
-├── stores/         # 状态管理
-├── utils/          # 工具函数
-└── views/          # 页面组件
+├── assets/         # Static resources
+├── components/     # Common components
+├── router/         # Route configuration
+├── stores/         # State management
+├── utils/          # Utility functions
+└── views/          # Page components
 ```
 
-## ✨ 功能模块
+## ✨ Feature Modules
 
-### 🔐 用户认证
+### 🔐 User Authentication
 
-- **用户注册**: 新用户注册功能，支持基本信息填写
-  ![注册页面](./assets/register.png)
-- **用户登录**: 支持用户名/邮箱登录，JWT Token认证
-  ![登录页面](./assets/login.png)
-- **密码修改**: 用户可自行修改登录密码
-  ![密码修改](./assets/password.png)
+- **User Registration**: New user registration with basic information input
+  ![Registration Page](./assets/register.png)
+- **User Login**: Support username/email login with JWT Token authentication
+  ![Login Page](./assets/login.png)
+- **Password Change**: Users can change their login password
+  ![Password Change](./assets/password.png)
 
-### 📊 数据统计
+### 📊 Data Statistics
 
-- **数据概览**: 提供系统关键数据统计和可视化图表
-  ![数据统计](./assets/statistics.png)
+- **Data Overview**: Provides key system data statistics and visualization charts
+  ![Data Statistics](./assets/statistics.png)
 
-### 👥 用户管理
+### 👥 User Management
 
-- **用户列表**: 查看所有用户信息，支持搜索和分页
-  ![用户管理](./assets/user.png)
-- **用户编辑**: 编辑用户基本信息和权限
-  ![用户编辑](./assets/user-edit.png)
+- **User List**: View all user information with search and pagination support
+  ![User Management](./assets/user.png)
+- **User Edit**: Edit user basic information and permissions
+  ![User Edit](./assets/user-edit.png)
 
-### 🏢 部门管理
+### 🏢 Department Management
 
-- **部门列表**: 管理企业部门结构
-  ![部门管理](./assets/department.png)
-- **新增部门**: 创建新的部门
-  ![新增部门](./assets/department-new.png)
+- **Department List**: Manage enterprise department structure
+  ![Department Management](./assets/department.png)
+- **Add Department**: Create new departments
+  ![Add Department](./assets/department-new.png)
 
-### 👤 员工管理
+### 👤 Employee Management
 
-- **员工列表**: 管理员工基本信息
-  ![员工管理](./assets/employee.png)
-- **员工编辑**: 编辑员工详细信息
-  ![员工编辑](./assets/employee-edit.png)
+- **Employee List**: Manage employee basic information
+  ![Employee Management](./assets/employee.png)
+- **Employee Edit**: Edit detailed employee information
+  ![Employee Edit](./assets/employee-edit.png)
 
-### 📝 文章管理
+### 📝 Article Management
 
-- **文章列表**: 管理和发布文章内容
-  ![文章管理](./assets/article.png)
-- **新增文章**: 创建和发布新文章
-  ![新增文章](./assets/article-new.png)
-- **文章预览**: 预览文章内容和格式
-  ![文章预览](./assets/article-preview.png)
+- **Article List**: Manage and publish article content
+  ![Article Management](./assets/article.png)
+- **Add Article**: Create and publish new articles
+  ![Add Article](./assets/article-new.png)
+- **Article Preview**: Preview article content and formatting
+  ![Article Preview](./assets/article-preview.png)
 
-### ℹ️ 个人中心
+### ℹ️ Personal Center
 
-- **个人信息**: 查看和编辑个人资料
-  ![个人信息](./assets/info.png)
-- **信息编辑**: 更新个人详细信息
-  ![信息编辑](./assets/info-edit.png)
+- **Personal Information**: View and edit personal profile
+  ![Personal Information](./assets/info.png)
+- **Information Edit**: Update detailed personal information
+  ![Information Edit](./assets/info-edit.png)
 
-### 🎯 管理后台
+### 🎯 Admin Dashboard
 
-- **管理首页**: 系统管理主界面
-  ![管理后台](./assets/admin.png)
-- **系统首页**: 用户登录后的首页展示
-  ![系统首页](./assets/homepage.png)
+- **Admin Home**: System management main interface
+  ![Admin Dashboard](./assets/admin.png)
+- **System Home**: Homepage display after user login
+  ![System Homepage](./assets/homepage.png)
 
-## 🔐 权限控制
+## 🔐 Permission Control
 
-系统实现了基于角色的权限控制：
+The system implements role-based access control:
 
-- **普通用户**: 可访问个人信息、密码修改等基础功能
-- **管理员**: 拥有所有模块的访问和管理权限
+- **Regular Users**: Can access personal information, password changes, and other basic functions
+- **Administrators**: Have access and management permissions for all modules
 
-## 🌐 后端项目
+## 🌐 Backend Project
 
-配套的后端项目地址：[admin-backend](https://github.com/zichuanxu/admin-backend)
+Companion backend project: [admin-backend](https://github.com/zichuanxu/admin-backend)
 
-## 🤝 贡献指南
+## 🤝 Contributing
 
-欢迎提交Issue和Pull Request来改进项目。
+Issues and Pull Requests are welcome to improve the project.
 
-## 📄 许可证
+## 📄 License
 
-本项目基于 [LICENSE](./LICENSE) 协议开源。
+This project is open source under the [LICENSE](./LICENSE) agreement.
